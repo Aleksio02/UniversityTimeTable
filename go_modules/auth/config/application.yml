@@ -1,0 +1,4 @@
+application:
+  name: "auth"
+  version: "0.0.1"
+  port: 8080
