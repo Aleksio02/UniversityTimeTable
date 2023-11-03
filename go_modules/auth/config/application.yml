@@ -2,3 +2,9 @@ application:
   name: "auth"
   version: "0.0.1"
   port: 8080
+  host: "localhost"
+  protocol: "http"
+
+github:
+  clientId: "96a839fbb3b81d8576e0"
+  secret: "54e2e59665c5ad7f7e96e683a0cc9cd706964b8a"

@@ -10,9 +10,15 @@ var Config appConfig
 type appConfig struct {
 	// Пример переменной, загружаемой в функции LoadConfig
 	Application struct {
-		Name    string
-		Version string
-		Port    int
+		Name     string
+		Version  string
+		Port     int
+		Host     string
+		Protocol string
+	}
+	GitHub struct {
+		ClientId string
+		Secret   string
 	}
 }
 

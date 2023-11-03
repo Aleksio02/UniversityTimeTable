@@ -18,6 +18,8 @@ func main() {
 	{
 		//v1.Use(auth())
 		v1.GET("/system/test", controller.SystemTest)
+		v1.POST("/getSession", controller.GetSession)
+		v1.GET("/sendToken", controller.SendToken)
 	}
 	r.Run(fmt.Sprintf(":%v", config.Config.Application.Port))
 }
