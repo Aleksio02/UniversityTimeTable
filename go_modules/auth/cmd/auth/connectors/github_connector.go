@@ -8,6 +8,7 @@ import (
 )
 
 const GITHUB_HOST_IP string = "https://github.com"
+const API_GITHUB_HOST_IP string = "https://api.github.com"
 
 func GetUserTokenFromGithub(code string) (*http.Response, error) {
 	getTokenMethod := "/login/oauth/access_token"
@@ -32,5 +33,14 @@ func GetUserTokenFromGithub(code string) (*http.Response, error) {
 	client := &http.Client{}
 	req, _ := http.NewRequest("POST", requestURL, nil)
 	req.Header.Set("Accept", "application/json")
+	return client.Do(req)
+}
+
+func GetUserInfo(token string, tokenType string) (*http.Response, error) {
+	methodName := "/user"
+	requestURL := API_GITHUB_HOST_IP + methodName
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", requestURL, nil)
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", tokenType, token))
 	return client.Do(req)
 }

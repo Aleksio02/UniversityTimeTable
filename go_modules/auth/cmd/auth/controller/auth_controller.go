@@ -49,17 +49,47 @@ func SendToken(c *gin.Context) {
 	chatId := pathParams["chatId"]
 	fmt.Println(chatId)
 
-	connectors.SendTokenInfo(jsonResponseBody)
+	githubUserResponse, _ := connectors.GetUserInfo(jsonResponseBody["access_token"], jsonResponseBody["token_type"])
+	githubUserResponseBody := getGitHubUserInfo(githubUserResponse.Body)
+
+	var userInfo = stresponse.UserInfo{}
+	userInfo.GitHubId = githubUserResponseBody.Id
+	var authResponse = stresponse.AuthResponse{Status: 200, UserInfo: userInfo}
+
+	connectors.SendTokenInfo(authResponse)
 
 	c.JSON(200, "You can close this page")
 }
 
+func MockTgBot(c *gin.Context) {
+	jsonRequestBody := getAuthResponse(c.Request.Body)
+
+	fmt.Println(jsonRequestBody)
+}
+
+// TODO: alexeyi: it should be 1 function
 func getResponseBody(body io.Reader) map[string]string {
 	responseBody, _ := ioutil.ReadAll(body)
 	jsonResponseBody := map[string]string{}
 	json.Unmarshal(responseBody, &jsonResponseBody)
 	return jsonResponseBody
 }
+
+func getGitHubUserInfo(body io.Reader) stresponse.GitHubGetUserResponse {
+	responseBody, _ := ioutil.ReadAll(body)
+	jsonResponseBody := stresponse.GitHubGetUserResponse{}
+	json.Unmarshal(responseBody, &jsonResponseBody)
+	return jsonResponseBody
+}
+
+func getAuthResponse(body io.Reader) stresponse.AuthResponse {
+	responseBody, _ := ioutil.ReadAll(body)
+	jsonResponseBody := stresponse.AuthResponse{}
+	json.Unmarshal(responseBody, &jsonResponseBody)
+	return jsonResponseBody
+}
+
+//////////////////////////////////////
 
 func generateAuthLink(chatId string) string {
 	githubHostIp := "https://github.com"
