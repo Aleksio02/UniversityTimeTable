@@ -10,10 +10,10 @@ type AuthResponse struct {
 	Status          int      `json:"status"`
 	ResponseMessage string   `json:"responseMessage"`
 	AuthLink        string   `json:"authLink"`
-	UserInfo        UserInfo `json:UserInfo`
+	UserInfo        UserInfo `json:"UserInfo"`
 }
 
 type GitHubGetUserResponse struct {
-	Id    int    `json:id`
-	Login string `json:login`
+	Id    int    `json:"id"`
+	Login string `json:"login"`
 }

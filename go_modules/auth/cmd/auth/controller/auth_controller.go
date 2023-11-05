@@ -3,6 +3,7 @@ package controller
 import (
 	"auth/cmd/auth/config"
 	"auth/cmd/auth/connectors"
+	"auth/cmd/auth/model/request"
 	stresponse "auth/cmd/auth/model/response"
 	"auth/cmd/auth/utils"
 	"encoding/json"
@@ -12,21 +13,23 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 func GetSession(c *gin.Context) {
-	//chatId, _ := strconv.ParseInt(c.Param("chatId"), 10, 32)
-	requestBody := getResponseBody(c.Request.Body)
+	requestBody := request.GetSessionRequest{}
+
+	writeBodyToObject(c.Request.Body, &requestBody)
 
 	var getSessionResponse stresponse.AuthResponse
 
-	if isAuthorized(requestBody["chatId"]) {
+	if isAuthorized(requestBody.ChatId) {
 		// TODO: alexeyi: implement this part
 		getSessionResponse.Status = 200
-		getSessionResponse.ResponseMessage = "Trying authorize chatId - " + requestBody["chatId"]
+		getSessionResponse.ResponseMessage = "Trying authorize chatId - " + strconv.Itoa(requestBody.ChatId)
 	} else {
 		getSessionResponse.Status = 401
-		getSessionResponse.AuthLink = generateAuthLink(requestBody["chatId"])
+		getSessionResponse.AuthLink = generateAuthLink(requestBody.ChatId)
 	}
 
 	c.JSON(http.StatusOK, getSessionResponse)
@@ -42,17 +45,20 @@ func SendToken(c *gin.Context) {
 	myUrl, _ := url.Parse(fullURL)
 	pathParams, _ := url.ParseQuery(myUrl.RawQuery)
 	res, _ := connectors.GetUserTokenFromGithub(pathParams.Get("code"))
-	jsonResponseBody := getResponseBody(res.Body)
+	jsonResponseBody := stresponse.GetGitHubUserToken{}
+	writeBodyToObject(res.Body, &jsonResponseBody)
 	res.Body.Close()
 
 	// save user info into db if it not exists
-	chatId := pathParams["chatId"]
-	fmt.Println(chatId)
+	chatId := pathParams["chatId"][0]
 
-	githubUserResponse, _ := connectors.GetUserInfo(jsonResponseBody["access_token"], jsonResponseBody["token_type"])
-	githubUserResponseBody := getGitHubUserInfo(githubUserResponse.Body)
+	githubUserResponse, _ := connectors.GetUserInfo(jsonResponseBody.AccessToken, jsonResponseBody.TokenType)
+	githubUserResponseBody := stresponse.GitHubGetUserResponse{}
+	writeBodyToObject(githubUserResponse.Body, &githubUserResponseBody)
+	githubUserResponse.Body.Close()
 
 	var userInfo = stresponse.UserInfo{}
+	userInfo.TelegramChatId = chatId
 	userInfo.GitHubId = githubUserResponseBody.Id
 	var authResponse = stresponse.AuthResponse{Status: 200, UserInfo: userInfo}
 
@@ -62,36 +68,18 @@ func SendToken(c *gin.Context) {
 }
 
 func MockTgBot(c *gin.Context) {
-	jsonRequestBody := getAuthResponse(c.Request.Body)
+	jsonRequestBody := stresponse.AuthResponse{}
+	writeBodyToObject(c.Request.Body, &jsonRequestBody)
 
 	fmt.Println(jsonRequestBody)
 }
 
-// TODO: alexeyi: it should be 1 function
-func getResponseBody(body io.Reader) map[string]string {
+func writeBodyToObject(body io.Reader, objectToWrite any) {
 	responseBody, _ := ioutil.ReadAll(body)
-	jsonResponseBody := map[string]string{}
-	json.Unmarshal(responseBody, &jsonResponseBody)
-	return jsonResponseBody
+	json.Unmarshal(responseBody, &objectToWrite)
 }
 
-func getGitHubUserInfo(body io.Reader) stresponse.GitHubGetUserResponse {
-	responseBody, _ := ioutil.ReadAll(body)
-	jsonResponseBody := stresponse.GitHubGetUserResponse{}
-	json.Unmarshal(responseBody, &jsonResponseBody)
-	return jsonResponseBody
-}
-
-func getAuthResponse(body io.Reader) stresponse.AuthResponse {
-	responseBody, _ := ioutil.ReadAll(body)
-	jsonResponseBody := stresponse.AuthResponse{}
-	json.Unmarshal(responseBody, &jsonResponseBody)
-	return jsonResponseBody
-}
-
-//////////////////////////////////////
-
-func generateAuthLink(chatId string) string {
+func generateAuthLink(chatId int) string {
 	githubHostIp := "https://github.com"
 	githubAuthorizeMethod := "/login/oauth/authorize"
 	clientId := config.Config.GitHub.ClientId
@@ -106,10 +94,10 @@ func generateAuthLink(chatId string) string {
 		githubAuthorizeMethod,
 		utils.CreatePathParam("client_id", clientId),
 		utils.CreatePathParam("redirect_uri", redirectUri),
-		utils.CreatePathParam("chatId", chatId))
+		utils.CreatePathParam("chatId", strconv.Itoa(chatId)))
 }
 
-func isAuthorized(chatId string) bool {
+func isAuthorized(chatId int) bool {
 	// TODO: alexeyi: implement me
 	return false
 }
