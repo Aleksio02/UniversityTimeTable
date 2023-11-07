@@ -4,7 +4,6 @@
 using json = nlohmann::json;
 
 using namespace httplib;
-
 using namespace std;
 
 int main() {
