@@ -1,11 +1,12 @@
 #include "../libs/cpp-httplib/httplib.h"
 #include "../libs/json.hpp"
+
 using json = nlohmann::json;
 
 using namespace httplib;
 using namespace std;
 
-void get_timetable_for_group(const Request& req,Response& res) {
+void get_timetable_for_group(const Request &req, Response &res) {
     string group_name = req.get_param_value("group_name");
     json timetable_for_group;
     timetable_for_group["group_name"] = group_name;
@@ -68,5 +69,5 @@ void get_timetable_for_group(const Request& req,Response& res) {
     timetable_for_group["monday"] = monday_timetable;
     timetable_for_group["tuesday"] = tuesday_timetable;
 
-    res.set_content(to_string(timetable_for_group),"application/json");
+    res.set_content(to_string(timetable_for_group), "application/json");
 }
