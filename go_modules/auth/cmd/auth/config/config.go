@@ -1,11 +1,17 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"github.com/spf13/viper"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 )
 
 var Config appConfig
+
+var DbManager *mongo.Database
 
 type appConfig struct {
 	// Пример переменной, загружаемой в функции LoadConfig
@@ -19,6 +25,13 @@ type appConfig struct {
 	GitHub struct {
 		ClientId string
 		Secret   string
+	}
+	Database struct {
+		Host     string
+		Port     int
+		Username string
+		Password string
+		DbName   string
 	}
 }
 
@@ -36,4 +49,28 @@ func LoadConfig(configPaths ...string) error {
 		return fmt.Errorf("failed to read the configuration file: %s", err)
 	}
 	return v.Unmarshal(&Config)
+}
+
+func CreateDatabaseConnection() {
+	// TODO: alexeyi: avoid hardcode
+	clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27017")
+	clientOptions.SetAuth(options.Credential{Username: "utt", Password: "utt123"})
+	client, err := mongo.NewClient(clientOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Create connect
+	err = client.Connect(context.TODO())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Check the connection
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	DbManager = client.Database("unitimetable")
 }

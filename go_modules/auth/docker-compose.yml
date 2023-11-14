@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mongo:
+    container_name: utt
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: utt
+      MONGO_INITDB_ROOT_PASSWORD: utt123
+      MONGO_INITDB_DATABASE: unitimetable
+    ports:
+      - '27017:27017'
+

@@ -1,16 +1,8 @@
 package response
 
-type UserInfo struct {
-	GitHubId       int
-	TelegramUserId string
-	TelegramChatId string
-}
-
 type AuthResponse struct {
-	Status          int      `json:"status"`
-	ResponseMessage string   `json:"responseMessage"`
-	AuthLink        string   `json:"authLink"`
-	UserInfo        UserInfo `json:"UserInfo"`
+	Status   int `json:"status"`
+	Response any `json:"response"`
 }
 
 type GitHubGetUserResponse struct {

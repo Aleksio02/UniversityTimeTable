@@ -17,22 +17,21 @@ func GetSession(c *gin.Context) {
 	requestBody := request.GetSessionRequest{}
 
 	utils.WriteBodyToObject(c.Request.Body, &requestBody)
-
 	var getSessionResponse stresponse.AuthResponse
+	foundUser, err := services.GetUserByTelegramChatId(requestBody.ChatId)
 
-	if services.IsAuthorized(requestBody.ChatId) {
-		// TODO: alexeyi: implement this part
+	if err == nil {
 		getSessionResponse.Status = 200
-		getSessionResponse.ResponseMessage = "Trying authorize chatId - " + strconv.Itoa(requestBody.ChatId)
+		getSessionResponse.Response = foundUser
 	} else {
 		getSessionResponse.Status = 401
-		getSessionResponse.AuthLink = generateAuthLink(requestBody.ChatId)
+		getSessionResponse.Response = generateAuthLink(requestBody.ChatId)
 	}
 
 	c.JSON(http.StatusOK, getSessionResponse)
 }
 
-func AuthenticateUser(c *gin.Context) {
+func CreateUser(c *gin.Context) {
 	fullURL := fmt.Sprintf("%s://%s:%d%s",
 		config.Config.Application.Protocol,
 		config.Config.Application.Host,
@@ -41,7 +40,7 @@ func AuthenticateUser(c *gin.Context) {
 	myUrl, _ := url.Parse(fullURL)
 	pathParams, _ := url.ParseQuery(myUrl.RawQuery)
 
-	services.AuthenticateUser(pathParams.Get("code"), pathParams["chatId"][0])
+	services.CreateUser(pathParams.Get("code"), pathParams["chatId"][0])
 	c.JSON(200, "You can close this page")
 }
 
@@ -49,13 +48,14 @@ func AuthenticateUser(c *gin.Context) {
 func MockTgBot(c *gin.Context) {
 	jsonRequestBody := stresponse.AuthResponse{}
 	utils.WriteBodyToObject(c.Request.Body, &jsonRequestBody)
+	fmt.Println("")
 }
 
 func generateAuthLink(chatId int) string {
 	githubHostIp := "https://github.com"
 	githubAuthorizeMethod := "/login/oauth/authorize"
 	clientId := config.Config.GitHub.ClientId
-	redirectUri := fmt.Sprintf("%s://%s:%d/%s/authenticateUser",
+	redirectUri := fmt.Sprintf("%s://%s:%d/%s/createUser",
 		config.Config.Application.Protocol,
 		config.Config.Application.Host,
 		config.Config.Application.Port,
