@@ -11,6 +11,7 @@ func main() {
 	if err := config.LoadConfig("./config"); err != nil {
 		panic(fmt.Errorf("invalid application configuration: %s", err))
 	}
+	config.CreateDatabaseConnection()
 
 	r := gin.New()
 
@@ -18,6 +19,9 @@ func main() {
 	{
 		//v1.Use(auth())
 		v1.GET("/system/test", controller.SystemTest)
+		v1.POST("/getSession", controller.GetSession)
+		v1.GET("/createUser", controller.CreateUser)
+		v1.POST("/sendAuthInfo", controller.MockTgBot)
 	}
 	r.Run(fmt.Sprintf(":%v", config.Config.Application.Port))
 }
