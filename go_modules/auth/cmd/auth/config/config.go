@@ -52,9 +52,8 @@ func LoadConfig(configPaths ...string) error {
 }
 
 func CreateDatabaseConnection() {
-	// TODO: alexeyi: avoid hardcode
-	clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27017")
-	clientOptions.SetAuth(options.Credential{Username: "utt", Password: "utt123"})
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Database.Host, Config.Database.Port))
+	clientOptions.SetAuth(options.Credential{Username: Config.Database.Username, Password: Config.Database.Password})
 	client, err := mongo.NewClient(clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -72,5 +71,5 @@ func CreateDatabaseConnection() {
 		log.Fatal(err)
 	}
 
-	DbManager = client.Database("unitimetable")
+	DbManager = client.Database(Config.Database.DbName)
 }
