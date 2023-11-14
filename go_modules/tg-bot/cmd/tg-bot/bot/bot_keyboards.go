@@ -2,6 +2,14 @@ package bot
 
 import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
+var BasicFeatures = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Просмотреть расписание"),
+		tgbotapi.NewKeyboardButton("Добавить информацию о себе"),
+		tgbotapi.NewKeyboardButton("Изменить расписание"),
+	),
+)
+
 var NumericKeyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("1"),

@@ -27,9 +27,13 @@ func CreateUser(tempCode string, chatId string) {
 	var userInfo = model.User{}
 	userInfo.TelegramChatId, _ = strconv.Atoi(chatId)
 	userInfo.GithubUserId = githubUserResponseBody.Id
-	userInfo = dao.CreateUser(userInfo)
 
-	var authResponse = stresponse.AuthResponse{Status: 200, Response: userInfo}
+	foundUser := dao.GetUserByTelegramChatId(userInfo.TelegramChatId)
+	if foundUser.TelegramChatId == 0 {
+		userInfo = dao.CreateUser(userInfo)
+	}
+
+	var authResponse = stresponse.AuthResponse{Status: 200, Response: userInfo, ChatId: userInfo.TelegramChatId}
 
 	connectors.SendUserInfo(authResponse)
 }

@@ -11,7 +11,6 @@ import (
 
 var Config appConfig
 
-var Bot *tgbotapi.BotAPI
 var err error
 
 type appConfig struct {
@@ -51,19 +50,20 @@ func StartHttpServer() {
 	{
 		//v1.Use(auth())
 		v1.GET("/system/test", controller.SystemTest)
+		v1.POST("/sendAuthInfo", controller.ReceiveAuthInfo)
 	}
 	r.Run(fmt.Sprintf(":%v", Config.Application.Port))
 }
 
 func StartTelegramBot() {
-	Bot, err = tgbotapi.NewBotAPI(Config.Telegram.Token)
+	bot.Bot, err = tgbotapi.NewBotAPI(Config.Telegram.Token)
 	if err != nil {
 		panic(err)
 	}
 
-	Bot.Debug = true
+	bot.Bot.Debug = true
 	updateConfig := tgbotapi.NewUpdate(0)
 	updateConfig.Timeout = 30
 
-	bot.StartBotHandler(Bot, updateConfig)
+	bot.StartBotHandler(bot.Bot, updateConfig)
 }

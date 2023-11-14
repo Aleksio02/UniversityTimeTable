@@ -2,6 +2,7 @@ package controller
 
 import (
 	"auth/cmd/auth/config"
+	"auth/cmd/auth/connectors"
 	stresponse "auth/cmd/auth/model/response"
 	"auth/cmd/auth/services"
 	"auth/cmd/auth/utils"
@@ -29,9 +30,13 @@ func GetSession(c *gin.Context) {
 	if err == nil {
 		getSessionResponse.Status = 200
 		getSessionResponse.Response = foundUser
+		getSessionResponse.ChatId = chatId
+		connectors.SendUserInfo(getSessionResponse)
 	} else {
 		getSessionResponse.Status = 401
 		getSessionResponse.Response = generateAuthLink(chatId)
+		getSessionResponse.ChatId = chatId
+		connectors.SendUserInfo(getSessionResponse)
 	}
 
 	c.JSON(http.StatusOK, getSessionResponse)
