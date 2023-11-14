@@ -22,4 +22,4 @@ func SendUserInfo(authResponse response.AuthResponse) (*http.Response, error) {
 }
 
 // TODO: alexeyi: set port to tg-bot and change it here
-const TELEGRAM_BOT_HOST_IP string = "http://localhost:8080/auth"
+const TELEGRAM_BOT_HOST_IP string = "http://localhost:8080/tg-bot"
