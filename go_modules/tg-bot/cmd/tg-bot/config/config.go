@@ -3,11 +3,16 @@ package config
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/spf13/viper"
+	"tg-bot/cmd/tg-bot/bot"
 	"tg-bot/cmd/tg-bot/controller"
 )
 
 var Config appConfig
+
+var Bot *tgbotapi.BotAPI
+var err error
 
 type appConfig struct {
 	// Пример переменной, загружаемой в функции LoadConfig
@@ -48,4 +53,17 @@ func StartHttpServer() {
 		v1.GET("/system/test", controller.SystemTest)
 	}
 	r.Run(fmt.Sprintf(":%v", Config.Application.Port))
+}
+
+func StartTelegramBot() {
+	Bot, err = tgbotapi.NewBotAPI(Config.Telegram.Token)
+	if err != nil {
+		panic(err)
+	}
+
+	Bot.Debug = true
+	updateConfig := tgbotapi.NewUpdate(0)
+	updateConfig.Timeout = 30
+
+	bot.StartBotHandler(Bot, updateConfig)
 }

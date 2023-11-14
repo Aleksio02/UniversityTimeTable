@@ -10,7 +10,6 @@ import (
 func SendUserInfo(authResponse response.AuthResponse) (*http.Response, error) {
 	methodName := "/sendAuthInfo"
 	requestURL := TELEGRAM_BOT_HOST_IP + methodName
-	requestURL = ""
 
 	authResponseAsReader, _ := json.Marshal(authResponse)
 

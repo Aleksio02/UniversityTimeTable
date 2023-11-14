@@ -19,7 +19,7 @@ func main() {
 	{
 		//v1.Use(auth())
 		v1.GET("/system/test", controller.SystemTest)
-		v1.POST("/getSession", controller.GetSession)
+		v1.GET("/getSession", controller.GetSession)
 		v1.GET("/createUser", controller.CreateUser)
 		v1.POST("/sendAuthInfo", controller.MockTgBot)
 	}

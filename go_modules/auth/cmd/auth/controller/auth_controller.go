@@ -2,7 +2,6 @@ package controller
 
 import (
 	"auth/cmd/auth/config"
-	"auth/cmd/auth/model/request"
 	stresponse "auth/cmd/auth/model/response"
 	"auth/cmd/auth/services"
 	"auth/cmd/auth/utils"
@@ -14,18 +13,25 @@ import (
 )
 
 func GetSession(c *gin.Context) {
-	requestBody := request.GetSessionRequest{}
+	fullURL := fmt.Sprintf("%s://%s:%d%s",
+		config.Config.Application.Protocol,
+		config.Config.Application.Host,
+		config.Config.Application.Port,
+		c.Request.RequestURI)
+	myUrl, _ := url.Parse(fullURL)
+	pathParams, _ := url.ParseQuery(myUrl.RawQuery)
 
-	utils.WriteBodyToObject(c.Request.Body, &requestBody)
+	chatId, _ := strconv.Atoi(pathParams.Get("chatId"))
+
 	var getSessionResponse stresponse.AuthResponse
-	foundUser, err := services.GetUserByTelegramChatId(requestBody.ChatId)
+	foundUser, err := services.GetUserByTelegramChatId(chatId)
 
 	if err == nil {
 		getSessionResponse.Status = 200
 		getSessionResponse.Response = foundUser
 	} else {
 		getSessionResponse.Status = 401
-		getSessionResponse.Response = generateAuthLink(requestBody.ChatId)
+		getSessionResponse.Response = generateAuthLink(chatId)
 	}
 
 	c.JSON(http.StatusOK, getSessionResponse)

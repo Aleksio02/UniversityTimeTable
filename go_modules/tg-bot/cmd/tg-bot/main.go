@@ -9,5 +9,8 @@ func main() {
 	if err := config.LoadConfig("./config"); err != nil {
 		panic(fmt.Errorf("invalid application configuration: %s", err))
 	}
-	config.StartHttpServer()
+	go config.StartHttpServer()
+
+	// Starting tg-bot
+	config.StartTelegramBot()
 }
