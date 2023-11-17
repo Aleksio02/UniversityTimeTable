@@ -1,5 +1,5 @@
-#include "../libs/cpp-httplib/httplib.h"
-#include "../libs/json.hpp"
+#include <httplib.h>
+#include "nlohmann//json.hpp"
 
 using json = nlohmann::json;
 

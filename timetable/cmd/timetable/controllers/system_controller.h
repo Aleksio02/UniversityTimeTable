@@ -5,8 +5,8 @@
 #ifndef TIMETABLE_SYSTEM_CONTROLLER_H
 #define TIMETABLE_SYSTEM_CONTROLLER_H
 
-#include "../libs/json.hpp"
-#include "../libs/cpp-httplib/httplib.h"
+#include "nlohmann/json.hpp"
+#include <httplib.h>
 
 using json = nlohmann::json;
 
