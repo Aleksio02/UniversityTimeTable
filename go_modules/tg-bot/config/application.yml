@@ -1,0 +1,9 @@
+application:
+  name: "tg-bot"
+  version: "0.0.1"
+  port: 8080
+  host: "localhost"
+  protocol: "http"
+
+telegram:
+  token: "6730323683:AAHFBsx3a7gBZ0JwLeCFxri6v86vo8oS_ZM"
